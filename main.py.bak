@@ -1,0 +1,114 @@
+import requests, bs4, re
+
+# from bs4 import BeautifulSoup
+
+URL = 'https://www.avito.ru/kogalym/kvartiry/prodam-ASgBAgICAUSSA8YQ'
+# URL = 'https://www.avito.ru/kogalym/kvartiry/'
+# ITEMS = 100
+headers = {
+    "Host": "m.avito.ru",
+    "User-Agent": "Safari",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive"
+}
+
+s = requests.get('https://2ip.ru/')
+b = bs4.BeautifulSoup(s.text, "html.parser")
+a = b.find("div", {'class': 'ip'})
+
+print('IP  ', a.text)
+
+# def extract_max_page ():
+# req = requests.get ('https://www.avito.ru/kogalym/kvartiry/', headers={'User-Agent': 'Mozilla/5.0'})
+# print (req)
+
+av_req = requests.get(f'{URL}')
+# av_req = requests.get (f'{URL}', headers=headers)
+print('av_req', av_req)
+# print (hh_req)
+# hh_req = requests.get ("https://www.avito.ru/kogalym/kvartiry/prodam/3-komnatnye-ASgBAQICAUSSA8YQAUDKCBSEWQ?cd=1")
+# print (hh_req.text)
+av_soup = None
+
+
+def av_soup_get(av_soup):
+    if av_soup == None or av_soup.find('div', {'class': 'pagination-root-PIE9V'}) == None:
+        av_soup = bs4.BeautifulSoup(av_req.text, "html.parser")
+    if av_soup != None:
+        print('av_soup = SOUP')
+        return av_soup
+    else:
+        print('av_soup = None')
+        av_soup_get(av_soup)
+
+
+av_soup = av_soup_get(av_soup)
+
+print ('av_soup', av_soup)
+print(av_soup.find('a', {'class': 'pagination-page'}))
+
+Links = []
+
+def Links_get(Links):
+    if Links == []:
+        Links = av_soup.find_all('a', {'class': 'pagination-page'})
+    if Links != []:
+        return Links
+    else:
+        print('Links[] = None')
+        Links_get(Links)
+
+
+Links = Links_get(Links)
+
+print('Links ', Links)
+print('Links 1 ', Links[1])
+print('Links 2', Links[2])
+# Links = paginator.find_all('a')
+# print (Links)
+# print (paginator.find('a').text)
+#
+pages = []
+
+def is_digit(string):
+    if string.isdigit():
+       return True
+    else:
+        try:
+            float(string)
+            return True
+        except ValueError:
+            return False
+
+for page in Links:
+    print ('page = ', page.text)
+    if is_digit(page.text):
+        print(type(page.text))
+        print(page.text)
+        pages.append(int(page.text))
+    else:
+        next
+        # print (page)
+        # print (page.find('a'))
+        # print (page.text)
+        # print ()
+
+print('pages = ', pages)
+#print('pages 1 = ', pages[1])
+#print('pages 2 = ', pages[2])
+# return pages[-1]
+# print (max_page)
+
+
+def extract_flat(last_page):
+    flat = []
+    # for page in range(last_page):
+    result = requests.get(f'{URL}?p=1', headers=headers)
+    # print(result.status_code)
+    soup = bs4.BeautifulSoup(result.text, 'html.parser')
+    results = soup.find_all('div', {'data-marker': 'item'})
+    for result in results:
+        print(result.find('a').text)
+
+    return flat
+# print (extract_hh_jobs (5))
